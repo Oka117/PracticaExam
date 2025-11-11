@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "Alice",
+    "Course": "INFT2064",
+    "Grade": "HD",
+    "Score": 99.5
+  },
+  {
+    "Name": "Bob",
+    "Course": "INFT2064",
+    "Grade": "P2",
+    "Score": 50.0
+  },
+  {
+    "Name": "Charlie",
+    "Course": "INFT2064",
+    "Grade": "C",
+    "Score": 70.1
+  },
+  {
+    "Name": "Dizzy",
+    "Course": "INFT2064",
+    "Grade": "D",
+    "Score": 81.2
+  },
+  {
+    "Name": "Ernie",
+    "Course": "INFT2064",
+    "Grade": "P1",
+    "Score": 57.6
+  }
+]

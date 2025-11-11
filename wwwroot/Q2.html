@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+
+    <div>
+        <h2>
+            Question 2
+        </h2>
+    </div>
+
+
+    <div>
+        <svg width="100%" height="600px" class="border border-primary rounded p-2"></svg>
+    </div>
+    <script type="module">
+        import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+		//let year = 2025;
+		//let items = [];
+
+			//if (year > 0){
+		fetch(`/api/WebAPI/D3GraphFetch`)
+			.then(response => response.json())	
+			.then(data => {
+				buildGraph(data);
+				//})
+			})
+
+	// 1 Select SVG element
+	const svg = d3.select('svg')
+
+	// 2 Determine the size of the SVG element
+	let w = svg.node().getBoundingClientRect().width
+	let h = svg.node().getBoundingClientRect().height
+
+
+	// 12 Chart Margins
+	const chartMargins = {
+		left: 40,
+		right: 25,
+		top: 25,
+		bottom: 80
+	}
+
+	w = w - (chartMargins.left + chartMargins.right);
+	h = h - (chartMargins.top + chartMargins.bottom);
+
+    svg.append("text")
+        .attr("x", (w / 2))
+        .attr("y", chartMargins.top) 
+        .attr("text-anchor", "middle") 
+        .style("font-size", "18px") 
+        .style("font-weight", "bold")
+        .text("Average Item price per decile");
+
+		function buildGraph(dataSet) {
+
+            let totalItemsRange = d3.extent(dataSet, d => d.AverageCost)
+			let maxTotalItems = totalItemsRange[1]
+
+			console.log(dataSet)
+
+			const barMargin = 10;
+			const barWidth = w / dataSet.length;
+
+			let yScale = d3.scaleLog()
+				.domain([1, maxTotalItems])
+				.range([h, 0]);
+
+			let deciles = Array.from(dataSet, d => d.Decile);
+
+			console.log(deciles)
+			console.log(yScale(d => d.AverageCost))
+
+			let xScale = d3.scaleBand()
+                .domain(deciles)
+				.range([0, w])
+				.paddingInner(0.1)
+
+			const chartGroup = svg.append('g')
+				.classed('chartGroup', true)
+				.attr('transform', `translate(${chartMargins.left},${chartMargins.top})`);
+
+			let barGroups = chartGroup
+				.selectAll('.bar-group')
+				.data(dataSet)
+
+			let newBarGroups = barGroups.enter()
+				.append('g')
+				.attr('transform', d => `translate(${xScale(d.Decile)},${yScale(d.AverageCost)})`);
+
+
+			newBarGroups
+				.append('rect')
+				.attr('x', 0)
+				//.attr('height', d => h - yScale(d.totalItems))
+				.attr('height', 0)
+                .attr('y', d => h - yScale(d.AverageCost))
+				.attr('width', xScale.bandwidth())
+				.attr('fill', 'transparent')
+				.transition().duration((_, i) => i * 500)
+				.delay((d, i) =>i + 200)
+				.attr('y', 0)
+				.attr('height', d => h - yScale(d.AverageCost))
+				.attr('fill', (d, i) => `rgb(20,20, ${d.AverageCost * 5})`)
+
+			let yAxis = d3.axisLeft(yScale);
+			chartGroup.append('g')
+				.classed('axis y', true)
+				.call(yAxis);
+
+			let xAxis = d3.axisBottom(xScale)
+			chartGroup.append('g')
+				.attr('transform', `translate(0,${h})`)
+				.classed('axis x', true)
+				.call(xAxis);
+
+			newBarGroups
+				.append('text')
+				.attr('text-anchor', 'middle')
+				.attr('x', d => xScale.bandwidth() / 2)
+				.attr('y', 20)
+				.attr('fill', 'white')
+				.style('font-size', '1em')
+				.text(d => d.Decile.toLocaleString());
+		}
+
+    </script>
+
+</body>
+</html>
